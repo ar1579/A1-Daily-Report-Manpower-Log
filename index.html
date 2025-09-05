@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Report & Manpower Log</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-gray: #f0f0f0;
+            --medium-gray: #ccc;
+            --dark-gray: #777;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .project-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .required::after {
+            content: "*";
+            color: var(--error-color);
+            margin-left: 4px;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            padding: 8px 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .has-error input, 
+        .has-error select {
+            border-color: var(--error-color);
+        }
+
+        .has-error .error-message {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .section-content {
+            padding: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid var(--medium-gray);
+        }
+
+        th {
+            background-color: var(--light-gray);
+            padding: 8px;
+            font-weight: bold;
+            text-align: left;
+            color: var(--primary-color);
+        }
+
+        td {
+            padding: 8px;
+        }
+
+        .input-cell {
+            height: 20px;
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        input[type="date"], 
+        select, 
+        textarea {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        input[readonly], 
+        select[readonly], 
+        textarea[readonly] {
+            background-color: var(--light-gray);
+            cursor: not-allowed;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .narrow {
+            width: 60px;
+        }
+
+        .medium {
+            width: 100px;
+        }
+
+        .wide {
+            width: 200px;
+        }
+
+        .totals-row {
+            font-weight: bold;
+            background-color: var(--light-gray);
+        }
+
+        .signature-section {
+            margin-top: 30px;
+        }
+
+        .signature-line {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .signature-line label {
+            width: 150px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .signature-line .signature-box {
+            flex: 1;
+            min-width: 200px;
+            border-bottom: 1px solid #333;
+            margin-right: 20px;
+            height: 30px;
+        }
+
+        .signature-line .date-box {
+            width: 150px;
+            border-bottom: 1px solid #333;
+        }
+
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+            min-width: 120px;
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .button-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .button-secondary {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .button-secondary:hover {
+            background-color: #ddd;
+        }
+
+        .button-danger {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .button-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-gray);
+            border-top: 5px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            z-index: 1001;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification-success {
+            background-color: var(--success-color);
+        }
+
+        .notification-error {
+            background-color: var(--error-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .project-info {
+                grid-template-columns: 1fr;
+            }
+
+            .signature-line {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .signature-line label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .signature-line .signature-box {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .signature-line .date-box {
+                width: 100%;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                font-size: 10pt;
+                background-color: white;
+            }
+
+            .container {
+                width: 100%;
+                max-width: none;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .button-group, 
+            .notification, 
+            .loading-overlay {
+                display: none !important;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+
+            .section {
+                page-break-inside: avoid;
+                border: 1px solid #ddd;
+                margin-bottom: 15pt;
+            }
+
+            .section-header {
+                background-color: #eee !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            input, select, textarea {
+                border: none;
+                background: transparent;
+            }
+
+            .signature-line {
+                margin-bottom: 15pt;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <div class="container">
+        <form id="dailyReportForm">
+            <div class="header">
+                <h1>DAILY REPORT & MANPOWER LOG</h1>
+            </div>
+            
+            <div class="project-info">
+                <div class="form-group">
+                    <label for="project-name" class="required">Project Name:</label>
+                    <input type="text" id="project-name" name="project-name" required>
+                    <div class="error-message">Project name is required</div>
+                </div>
+                <div class="form-group">
+                    <label for="project-number" class="required">Project Number:</label>
+                    <input type="text" id="project-number" name="project-number" required>
+                    <div class="error-message">Project number is required</div>
+                </div>
+                <div class="form-group">
+                    <label for="project-location" class="required">Project Location:</label>
+                    <input type="text" id="project-location" name="project-location" required>
+                    <div class="error-message">Project location is required</div>
+                </div>
+                <div class="form-group">
+                    <label for="report-date" class="required">Date:</label>
+                    <input type="date" id="report-date" name="report-date" required>
+                    <div class="error-message">Date is required</div>
+                </div>
+                <div class="form-group">
+                    <label for="weather-conditions" class="required">Weather Conditions:</label>
+                    <input type="text" id="weather-conditions" name="weather-conditions" required>
+                    <div class="error-message">Weather conditions are required</div>
+                </div>
+                <div class="form-group">
+                    <label for="temperature" class="required">Temperature Range:</label>
+                    <input type="text" id="temperature" name="temperature" placeholder="e.g., 65°F - 78°F" required>
+                    <div class="error-message">Temperature range is required</div>
+                </div>
+                <div class="form-group">
+                    <label for="superintendent" class="required">Superintendent:</label>
+                    <input type="text" id="superintendent" name="superintendent" required>
+                    <div class="error-message">Superintendent name is required</div>
+                </div>
+                <div class="form-group">
+                    <label for="report-number">Report #:</label>
+                    <input type="text" id="report-number" name="report-number">
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">MANPOWER</div>
+                <div class="section-content">
+                    <table id="manpower-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="25%">Contractor Company</th>
+                                <th width="15%">Trade</th>
+                                <th width="10%">Number of Workers</th>
+                                <th width="10%">Hours Worked</th>
+                                <th width="25%">Work Areas</th>
+                                <th width="10%">Productivity (1-5)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 8 rows for manpower entries -->
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" name="contractor-1" id="contractor-1"></td>
+                                <td><input type="text" name="trade-1" id="trade-1"></td>
+                                <td><input type="number" name="workers-1" id="workers-1" min="0" step="1"></td>
+                                <td><input type="number" name="hours-1" id="hours-1" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-1" id="areas-1"></td>
+                                <td>
+                                    <select name="productivity-1" id="productivity-1">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><input type="text" name="contractor-2" id="contractor-2"></td>
+                                <td><input type="text" name="trade-2" id="trade-2"></td>
+                                <td><input type="number" name="workers-2" id="workers-2" min="0" step="1"></td>
+                                <td><input type="number" name="hours-2" id="hours-2" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-2" id="areas-2"></td>
+                                <td>
+                                    <select name="productivity-2" id="productivity-2">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><input type="text" name="contractor-3" id="contractor-3"></td>
+                                <td><input type="text" name="trade-3" id="trade-3"></td>
+                                <td><input type="number" name="workers-3" id="workers-3" min="0" step="1"></td>
+                                <td><input type="number" name="hours-3" id="hours-3" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-3" id="areas-3"></td>
+                                <td>
+                                    <select name="productivity-3" id="productivity-3">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td><input type="text" name="contractor-4" id="contractor-4"></td>
+                                <td><input type="text" name="trade-4" id="trade-4"></td>
+                                <td><input type="number" name="workers-4" id="workers-4" min="0" step="1"></td>
+                                <td><input type="number" name="hours-4" id="hours-4" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-4" id="areas-4"></td>
+                                <td>
+                                    <select name="productivity-4" id="productivity-4">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td><input type="text" name="contractor-5" id="contractor-5"></td>
+                                <td><input type="text" name="trade-5" id="trade-5"></td>
+                                <td><input type="number" name="workers-5" id="workers-5" min="0" step="1"></td>
+                                <td><input type="number" name="hours-5" id="hours-5" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-5" id="areas-5"></td>
+                                <td>
+                                    <select name="productivity-5" id="productivity-5">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td><input type="text" name="contractor-6" id="contractor-6"></td>
+                                <td><input type="text" name="trade-6" id="trade-6"></td>
+                                <td><input type="number" name="workers-6" id="workers-6" min="0" step="1"></td>
+                                <td><input type="number" name="hours-6" id="hours-6" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-6" id="areas-6"></td>
+                                <td>
+                                    <select name="productivity-6" id="productivity-6">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td><input type="text" name="contractor-7" id="contractor-7"></td>
+                                <td><input type="text" name="trade-7" id="trade-7"></td>
+                                <td><input type="number" name="workers-7" id="workers-7" min="0" step="1"></td>
+                                <td><input type="number" name="hours-7" id="hours-7" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-7" id="areas-7"></td>
+                                <td>
+                                    <select name="productivity-7" id="productivity-7">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td><input type="text" name="contractor-8" id="contractor-8"></td>
+                                <td><input type="text" name="trade-8" id="trade-8"></td>
+                                <td><input type="number" name="workers-8" id="workers-8" min="0" step="1"></td>
+                                <td><input type="number" name="hours-8" id="hours-8" min="0" step="0.5"></td>
+                                <td><input type="text" name="areas-8" id="areas-8"></td>
+                                <td>
+                                    <select name="productivity-8" id="productivity-8">
+                                        <option value=""></option>
+                                        <option value="1">1 - Poor</option>
+                                        <option value="2">2 - Below Average</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr class="totals-row">
+                                <td colspan="3" style="text-align: right;">TOTALS:</td>
+                                <td><input type="number" name="total-workers" id="total-workers" readonly></td>
+                                <td><input type="number" name="total-hours" id="total-hours" readonly></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">EQUIPMENT</div>
+                <div class="section-content">
+                    <table id="equipment-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="30%">Equipment Type</th>
+                                <th width="10%">Quantity</th>
+                                <th width="10%">Hours Used</th>
+                                <th width="45%" colspan="2">Activity Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 5 rows for equipment entries -->
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" name="equipment-1" id="equipment-1"></td>
+                                <td><input type="number" name="equipment-qty-1" id="equipment-qty-1" min="0" step="1"></td>
+                                <td><input type="number" name="equipment-hours-1" id="equipment-hours-1" min="0" step="0.5"></td>
+                                <td colspan="2"><input type="text" name="equipment-activity-1" id="equipment-activity-1"></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><input type="text" name="equipment-2" id="equipment-2"></td>
+                                <td><input type="number" name="equipment-qty-2" id="equipment-qty-2" min="0" step="1"></td>
+                                <td><input type="number" name="equipment-hours-2" id="equipment-hours-2" min="0" step="0.5"></td>
+                                <td colspan="2"><input type="text" name="equipment-activity-2" id="equipment-activity-2"></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><input type="text" name="equipment-3" id="equipment-3"></td>
+                                <td><input type="number" name="equipment-qty-3" id="equipment-qty-3" min="0" step="1"></td>
+                                <td><input type="number" name="equipment-hours-3" id="equipment-hours-3" min="0" step="0.5"></td>
+                                <td colspan="2"><input type="text" name="equipment-activity-3" id="equipment-activity-3"></td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td><input type="text" name="equipment-4" id="equipment-4"></td>
+                                <td><input type="number" name="equipment-qty-4" id="equipment-qty-4" min="0" step="1"></td>
+                                <td><input type="number" name="equipment-hours-4" id="equipment-hours-4" min="0" step="0.5"></td>
+                                <td colspan="2"><input type="text" name="equipment-activity-4" id="equipment-activity-4"></td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td><input type="text" name="equipment-5" id="equipment-5"></td>
+                                <td><input type="number" name="equipment-qty-5" id="equipment-qty-5" min="0" step="1"></td>
+                                <td><input type="number" name="equipment-hours-5" id="equipment-hours-5" min="0" step="0.5"></td>
+                                <td colspan="2"><input type="text" name="equipment-activity-5" id="equipment-activity-5"></td>
+                            </tr>
+                            <tr class="totals-row">
+                                <td colspan="2" style="text-align: right;">TOTALS:</td>
+                                <td><input type="number" name="total-equipment" id="total-equipment" readonly></td>
+                                <td><input type="number" name="total-equipment-hours" id="total-equipment-hours" readonly></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">MATERIALS RECEIVED</div>
+                <div class="section-content">
+                    <table id="materials-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="25%">Material Type</th>
+                                <th width="10%">Quantity</th>
+                                <th width="10%">Unit</th>
+                                <th width="25%">Supplier</th>
+                                <th width="25%">Storage Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 5 rows for materials entries -->
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" name="material-1" id="material-1"></td>
+                                <td><input type="number" name="material-qty-1" id="material-qty-1" min="0" step="0.01"></td>
+                                <td><input type="text" name="material-unit-1" id="material-unit-1"></td>
+                                <td><input type="text" name="material-supplier-1" id="material-supplier-1"></td>
+                                <td><input type="text" name="material-location-1" id="material-location-1"></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><input type="text" name="material-2" id="material-2"></td>
+                                <td><input type="number" name="material-qty-2" id="material-qty-2" min="0" step="0.01"></td>
+                                <td><input type="text" name="material-unit-2" id="material-unit-2"></td>
+                                <td><input type="text" name="material-supplier-2" id="material-supplier-2"></td>
+                                <td><input type="text" name="material-location-2" id="material-location-2"></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><input type="text" name="material-3" id="material-3"></td>
+                                <td><input type="number" name="material-qty-3" id="material-qty-3" min="0" step="0.01"></td>
+                                <td><input type="text" name="material-unit-3" id="material-unit-3"></td>
+                                <td><input type="text" name="material-supplier-3" id="material-supplier-3"></td>
+                                <td><input type="text" name="material-location-3" id="material-location-3"></td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td><input type="text" name="material-4" id="material-4"></td>
+                                <td><input type="number" name="material-qty-4" id="material-qty-4" min="0" step="0.01"></td>
+                                <td><input type="text" name="material-unit-4" id="material-unit-4"></td>
+                                <td><input type="text" name="material-supplier-4" id="material-supplier-4"></td>
+                                <td><input type="text" name="material-location-4" id="material-location-4"></td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td><input type="text" name="material-5" id="material-5"></td>
+                                <td><input type="number" name="material-qty-5" id="material-qty-5" min="0" step="0.01"></td>
+                                <td><input type="text" name="material-unit-5" id="material-unit-5"></td>
+                                <td><input type="text" name="material-supplier-5" id="material-supplier-5"></td>
+                                <td><input type="text" name="material-location-5" id="material-location-5"></td>
+                            </tr>
+                            <tr class="totals-row">
+                                <td colspan="2" style="text-align: right;">TOTAL DELIVERIES:</td>
+                                <td colspan="4" id="total-deliveries">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="page-break"></div>
+            
+            <div class="section">
+                <div class="section-header">WORK COMPLETED</div>
+                <div class="section-content">
+                    <table id="work-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="50%" colspan="2">Description of Work</th>
+                                <th width="25%">Area/Location</th>
+                                <th width="20%">% Complete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 5 rows for work completed entries -->
+                            <tr>
+                                <td>1</td>
+                                <td colspan="2"><input type="text" name="work-1" id="work-1"></td>
+                                <td><input type="text" name="work-area-1" id="work-area-1"></td>
+                                <td><input type="number" name="work-complete-1" id="work-complete-1" min="0" max="100"></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td colspan="2"><input type="text" name="work-2" id="work-2"></td>
+                                <td><input type="text" name="work-area-2" id="work-area-2"></td>
+                                <td><input type="number" name="work-complete-2" id="work-complete-2" min="0" max="100"></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td colspan="2"><input type="text" name="work-3" id="work-3"></td>
+                                <td><input type="text" name="work-area-3" id="work-area-3"></td>
+                                <td><input type="number" name="work-complete-3" id="work-complete-3" min="0" max="100"></td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td colspan="2"><input type="text" name="work-4" id="work-4"></td>
+                                <td><input type="text" name="work-area-4" id="work-area-4"></td>
+                                <td><input type="number" name="work-complete-4" id="work-complete-4" min="0" max="100"></td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td colspan="2"><input type="text" name="work-5" id="work-5"></td>
+                                <td><input type="text" name="work-area-5" id="work-area-5"></td>
+                                <td><input type="number" name="work-complete-5" id="work-complete-5" min="0" max="100"></td>
+                            </tr>
+                            <tr class="totals-row">
+                                <td colspan="4" style="text-align: right;">OVERALL DAILY PROGRESS:</td>
+                                <td><input type="number" name="overall-progress" id="overall-progress" readonly></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">ISSUES/DELAYS</div>
+                <div class="section-content">
+                    <table id="issues-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="45%" colspan="2">Description</th>
+                                <th width="20%">Impact</th>
+                                <th width="30%">Resolution Status/Plan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 3 rows for issues/delays entries -->
+                            <tr>
+                                <td>1</td>
+                                <td colspan="2"><input type="text" name="issue-1" id="issue-1"></td>
+                                <td>
+                                    <select name="issue-impact-1" id="issue-impact-1">
+                                        <option value=""></option>
+                                        <option value="None">None</option>
+                                        <option value="Minor">Minor</option>
+                                        <option value="Major">Major</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" name="issue-resolution-1" id="issue-resolution-1"></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td colspan="2"><input type="text" name="issue-2" id="issue-2"></td>
+                                <td>
+                                    <select name="issue-impact-2" id="issue-impact-2">
+                                        <option value=""></option>
+                                        <option value="None">None</option>
+                                        <option value="Minor">Minor</option>
+                                        <option value="Major">Major</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" name="issue-resolution-2" id="issue-resolution-2"></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td colspan="2"><input type="text" name="issue-3" id="issue-3"></td>
+                                <td>
+                                    <select name="issue-impact-3" id="issue-impact-3">
+                                        <option value=""></option>
+                                        <option value="None">None</option>
+                                        <option value="Minor">Minor</option>
+                                        <option value="Major">Major</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" name="issue-resolution-3" id="issue-resolution-3"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">SAFETY OBSERVATIONS & INCIDENTS</div>
+                <div class="section-content">
+                    <table id="safety-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="45%" colspan="2">Observation/Incident Description</th>
+                                <th width="30%">Action Taken</th>
+                                <th width="20%">Reportable (Y/N)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 3 rows for safety entries -->
+                            <tr>
+                                <td>1</td>
+                                <td colspan="2"><input type="text" name="safety-1" id="safety-1"></td>
+                                <td><input type="text" name="safety-action-1" id="safety-action-1"></td>
+                                <td>
+                                    <select name="safety-reportable-1" id="safety-reportable-1">
+                                        <option value=""></option>
+                                        <option value="Y">Yes</option>
+                                        <option value="N">No</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td colspan="2"><input type="text" name="safety-2" id="safety-2"></td>
+                                <td><input type="text" name="safety-action-2" id="safety-action-2"></td>
+                                <td>
+                                    <select name="safety-reportable-2" id="safety-reportable-2">
+                                        <option value=""></option>
+                                        <option value="Y">Yes</option>
+                                        <option value="N">No</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td colspan="2"><input type="text" name="safety-3" id="safety-3"></td>
+                                <td><input type="text" name="safety-action-3" id="safety-action-3"></td>
+                                <td>
+                                    <select name="safety-reportable-3" id="safety-reportable-3">
+                                        <option value=""></option>
+                                        <option value="Y">Yes</option>
+                                        <option value="N">No</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">QUALITY CONTROL INSPECTIONS</div>
+                <div class="section-content">
+                    <table id="quality-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="35%" colspan="2">Inspection Description</th>
+                                <th width="20%">Area/Location</th>
+                                <th width="20%">Inspector</th>
+                                <th width="20%">Pass/Fail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 3 rows for quality control entries -->
+                            <tr>
+                                <td>1</td>
+                                <td colspan="2"><input type="text" name="inspection-1" id="inspection-1"></td>
+                                <td><input type="text" name="inspection-area-1" id="inspection-area-1"></td>
+                                <td><input type="text" name="inspector-1" id="inspector-1"></td>
+                                <td>
+                                    <select name="inspection-result-1" id="inspection-result-1">
+                                        <option value=""></option>
+                                        <option value="Pass">Pass</option>
+                                        <option value="Fail">Fail</option>
+                                        <option value="N/A">N/A</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td colspan="2"><input type="text" name="inspection-2" id="inspection-2"></td>
+                                <td><input type="text" name="inspection-area-2" id="inspection-area-2"></td>
+                                <td><input type="text" name="inspector-2" id="inspector-2"></td>
+                                <td>
+                                    <select name="inspection-result-2" id="inspection-result-2">
+                                        <option value=""></option>
+                                        <option value="Pass">Pass</option>
+                                        <option value="Fail">Fail</option>
+                                        <option value="N/A">N/A</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td colspan="2"><input type="text" name="inspection-3" id="inspection-3"></td>
+                                <td><input type="text" name="inspection-area-3" id="inspection-area-3"></td>
+                                <td><input type="text" name="inspector-3" id="inspector-3"></td>
+                                <td>
+                                    <select name="inspection-result-3" id="inspection-result-3">
+                                        <option value=""></option>
+                                        <option value="Pass">Pass</option>
+                                        <option value="Fail">Fail</option>
+                                        <option value="N/A">N/A</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">VISITOR LOG</div>
+                <div class="section-content">
+                    <table id="visitor-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="25%">Visitor Name</th>
+                                <th width="25%">Company</th>
+                                <th width="25%">Purpose</th>
+                                <th width="10%">Time In</th>
+                                <th width="10%">Time Out</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 3 rows for visitor entries -->
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" name="visitor-1" id="visitor-1"></td>
+                                <td><input type="text" name="visitor-company-1" id="visitor-company-1"></td>
+                                <td><input type="text" name="visitor-purpose-1" id="visitor-purpose-1"></td>
+                                <td><input type="text" name="visitor-in-1" id="visitor-in-1" placeholder="HH:MM"></td>
+                                <td><input type="text" name="visitor-out-1" id="visitor-out-1" placeholder="HH:MM"></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><input type="text" name="visitor-2" id="visitor-2"></td>
+                                <td><input type="text" name="visitor-company-2" id="visitor-company-2"></td>
+                                <td><input type="text" name="visitor-purpose-2" id="visitor-purpose-2"></td>
+                                <td><input type="text" name="visitor-in-2" id="visitor-in-2" placeholder="HH:MM"></td>
+                                <td><input type="text" name="visitor-out-2" id="visitor-out-2" placeholder="HH:MM"></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><input type="text" name="visitor-3" id="visitor-3"></td>
+                                <td><input type="text" name="visitor-company-3" id="visitor-company-3"></td>
+                                <td><input type="text" name="visitor-purpose-3" id="visitor-purpose-3"></td>
+                                <td><input type="text" name="visitor-in-3" id="visitor-in-3" placeholder="HH:MM"></td>
+                                <td><input type="text" name="visitor-out-3" id="visitor-out-3" placeholder="HH:MM"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">DAILY PHOTOS</div>
+                <div class="section-content">
+                    <p style="font-style: italic; margin: 5px 0;">Insert links to photos or note photo reference numbers</p>
+                    <textarea name="photo-references" id="photo-references" rows="3" style="width: 100%; margin-top: 5px;"></textarea>
+                </div>
+            </div>
+            
+            <div class="signature-section">
+                <div class="section-header">APPROVAL</div>
+                <div class="section-content">
+                    <div class="signature-line" style="margin-top: 15px;">
+                        <label>Prepared By:</label>
+                        <div class="signature-box">
+                            <input type="text" name="prepared-by" id="prepared-by">
+                        </div>
+                        <div class="date-box">
+                            <input type="date" name="prepared-date" id="prepared-date">
+                        </div>
+                    </div>
+                    <div class="signature-line">
+                        <label>Superintendent:</label>
+                        <div class="signature-box">
+                            <input type="text" name="superintendent-signature" id="superintendent-signature">
+                        </div>
+                        <div class="date-box">
+                            <input type="date" name="superintendent-date" id="superintendent-date">
+                        </div>
+                    </div>
+                    <div class="signature-line">
+                        <label>Project Manager:</label>
+                        <div class="signature-box">
+                            <input type="text" name="pm-signature" id="pm-signature">
+                        </div>
+                        <div class="date-box">
+                            <input type="date" name="pm-date" id="pm-date">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" id="save-draft-btn" class="button button-secondary">Save Draft</button>
+                <button type="button" id="print-btn" class="button button-secondary">Print Report</button>
+                <button type="reset" id="reset-btn" class="button button-danger">Reset Form</button>
+                <button type="submit" id="submit-btn" class="button button-primary">Submit Report</button>
+            </div>
+            
+            <input type="hidden" name="timestamp" id="timestamp">
+            <input type="hidden" name="form-version" id="form-version" value="1.0">
+            <input type="hidden" name="submitter-email" id="submitter-email">
+        </form>
+    </div>
+
+    <script>
+    /**
+     * A1 Daily Report & Manpower Log - Form JavaScript
+     * 
+     * This script provides enhanced functionality for the Daily Report & Manpower Log form,
+     * including validation, calculations, data persistence, and form submission.
+     * 
+     * @version 1.0
+     * @date 2025-09-04
+     */
+
+    /**
+     * Initialize the form when the DOM is fully loaded
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default date to today
+        setDefaultDate();
+        
+        // Initialize calculations
+        calculateManpowerTotals();
+        calculateEquipmentTotals();
+        calculateOverallProgress();
+        calculateTotalDeliveries();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Load saved draft if available
+        loadSavedDraft();
+        
+        // Set up form submission handler
+        setupFormSubmission();
+    });
+
+    /**
+     * Set the default date to today
+     */
+    function setDefaultDate() {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        document.getElementById('report-date').value = formattedDate;
+        document.getElementById('prepared-date').value = formattedDate;
+        document.getElementById('superintendent-date').value = formattedDate;
+        document.getElementById('pm-date').value = formattedDate;
+    }
+
+    /**
+     * Calculate manpower totals (workers and hours)
+     */
+    function calculateManpowerTotals() {
+        let totalWorkers = 0;
+        let totalHours = 0;
+        
+        // Loop through all manpower entries
+        for (let i = 1; i <= 8; i++) {
+            const workersInput = document.getElementById(`workers-${i}`);
+            const hoursInput = document.getElementById(`hours-${i}`);
+            
+            const workers = workersInput ? parseInt(workersInput.value) || 0 : 0;
+            const hours = hoursInput ? parseFloat(hoursInput.value) || 0 : 0;
+            
+            totalWorkers += workers;
+            totalHours += hours;
+        }
+        
+        // Update total fields
+        document.getElementById('total-workers').value = totalWorkers;
+        document.getElementById('total-hours').value = totalHours.toFixed(1);
+    }
+
+    /**
+     * Calculate equipment totals (quantity and hours)
+     */
+    function calculateEquipmentTotals() {
+        let totalEquipment = 0;
+        let totalHours = 0;
+        
+        // Loop through all equipment entries
+        for (let i = 1; i <= 5; i++) {
+            const qtyInput = document.getElementById(`equipment-qty-${i}`);
+            const hoursInput = document.getElementById(`equipment-hours-${i}`);
+            
+            const qty = qtyInput ? parseInt(qtyInput.value) || 0 : 0;
+            const hours = hoursInput ? parseFloat(hoursInput.value) || 0 : 0;
+            
+            totalEquipment += qty;
+            totalHours += hours;
+        }
+        
+        // Update total fields
+        document.getElementById('total-equipment').value = totalEquipment;
+        document.getElementById('total-equipment-hours').value = totalHours.toFixed(1);
+    }
+
+    /**
+     * Calculate overall work progress percentage
+     */
+    function calculateOverallProgress() {
+        let totalProgress = 0;
+        let count = 0;
+        
+        // Loop through all work completed entries
+        for (let i = 1; i <= 5; i++) {
+            const progressInput = document.getElementById(`work-complete-${i}`);
+            
+            if (progressInput && progressInput.value) {
+                const progress = parseInt(progressInput.value) || 0;
+                totalProgress += progress;
+                count++;
+            }
+        }
+        
+        // Update overall progress field
+        const overallProgressInput = document.getElementById('overall-progress');
+        if (count > 0) {
+            overallProgressInput.value = Math.round(totalProgress / count);
+            
+            // Apply conditional formatting
+            if (overallProgressInput.value < 50) {
+                overallProgressInput.style.color = 'var(--error-color)';
+            } else if (overallProgressInput.value >= 80) {
+                overallProgressInput.style.color = 'var(--success-color)';
+            } else {
+                overallProgressInput.style.color = '';
+            }
+        } else {
+            overallProgressInput.value = '';
+            overallProgressInput.style.color = '';
+        }
+    }
+
+    /**
+     * Calculate total number of material deliveries
+     */
+    function calculateTotalDeliveries() {
+        let deliveries = 0;
+        
+        // Count non-empty material entries
+        for (let i = 1; i <= 5; i++) {
+            const materialInput = document.getElementById(`material-${i}`);
+            if (materialInput && materialInput.value.trim() !== '') {
+                deliveries++;
+            }
+        }
+        
+        // Update total deliveries
+        document.getElementById('total-deliveries').textContent = deliveries;
+    }
+
+    /**
+     * Apply conditional formatting to highlight issues, safety incidents, etc.
+     */
+    function applyConditionalFormatting() {
+        // Highlight major impact issues
+        for (let i = 1; i <= 3; i++) {
+            const impactSelect = document.getElementById(`issue-impact-${i}`);
+            const issueInput = document.getElementById(`issue-${i}`);
+            
+            if (impactSelect && issueInput) {
+                if (impactSelect.value === 'Major') {
+                    issueInput.style.color = 'var(--error-color)';
+                    impactSelect.style.color = 'var(--error-color)';
+                } else {
+                    issueInput.style.color = '';
+                    impactSelect.style.color = '';
+                }
+            }
+        }
+        
+        // Highlight reportable safety incidents
+        for (let i = 1; i <= 3; i++) {
+            const reportableSelect = document.getElementById(`safety-reportable-${i}`);
+            const safetyInput = document.getElementById(`safety-${i}`);
+            
+            if (reportableSelect && safetyInput) {
+                if (reportableSelect.value === 'Y') {
+                    safetyInput.style.color = 'var(--error-color)';
+                    reportableSelect.style.color = 'var(--error-color)';
+                } else {
+                    safetyInput.style.color = '';
+                    reportableSelect.style.color = '';
+                }
+            }
+        }
+        
+        // Highlight quality failures
+        for (let i = 1; i <= 3; i++) {
+            const resultSelect = document.getElementById(`inspection-result-${i}`);
+            const inspectionInput = document.getElementById(`inspection-${i}`);
+            
+            if (resultSelect && inspectionInput) {
+                if (resultSelect.value === 'Fail') {
+                    inspectionInput.style.color = 'var(--error-color)';
+                    resultSelect.style.color = 'var(--error-color)';
+                } else {
+                    inspectionInput.style.color = '';
+                    resultSelect.style.color = '';
+                }
+            }
+        }
+        
+        // Highlight productivity ratings
+        for (let i = 1; i <= 8; i++) {
+            const productivitySelect = document.getElementById(`productivity-${i}`);
+            
+            if (productivitySelect) {
+                const value = productivitySelect.value;
+                if (value === '1' || value === '2') {
+                    productivitySelect.style.color = 'var(--error-color)';
+                } else if (value === '4' || value === '5') {
+                    productivitySelect.style.color = 'var(--success-color)';
+                } else {
+                    productivitySelect.style.color = '';
+                }
+            }
+        }
+    }
+
+    /**
+     * Validate a numeric input field
+     * @param {HTMLElement} field - The input field to validate
+     * @returns {boolean} - True if valid, false otherwise
+     */
+    function validateNumericField(field) {
+        const value = field.value.trim();
+        
+        if (value === '') {
+            return true; // Empty is allowed unless required
+        }
+        
+        if (isNaN(value)) {
+            showError(field, 'Please enter a valid number');
+            return false;
+        }
+        
+        clearError(field);
+        return true;
+    }
+
+    /**
+     * Validate a percentage field (0-100)
+     * @param {HTMLElement} field - The input field to validate
+     * @returns {boolean} - True if valid, false otherwise
+     */
+    function validatePercentageField(field) {
+        const value = field.value.trim();
+        
+        if (value === '') {
+            return true; // Empty is allowed unless required
+        }
+        
+        if (isNaN(value)) {
+            showError(field, 'Please enter a valid number');
+            return false;
+        }
+        
+        const numValue = parseFloat(value);
+        if (numValue < 0 || numValue > 100) {
+            showError(field, 'Percentage must be between 0 and 100');
+            return false;
+        }
+        
+        clearError(field);
+        return true;
+    }
+
+    /**
+     * Validate a time field (HH:MM format)
+     * @param {HTMLElement} field - The input field to validate
+     * @returns {boolean} - True if valid, false otherwise
+     */
+    function validateTimeField(field) {
+        const value = field.value.trim();
+        
+        if (value === '') {
+            return true; // Empty is allowed unless required
+        }
+        
+        const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
+        if (!timeRegex.test(value)) {
+            showError(field, 'Please enter time in HH:MM format (e.g., 09:30)');
+            return false;
+        }
+        
+        clearError(field);
+        return true;
+    }
+
+    /**
+     * Validate time in/out pairs to ensure time in is before time out
+     * @returns {boolean} - True if valid, false otherwise
+     */
+    function validateTimeInOut() {
+        let isValid = true;
+        
+        for (let i = 1; i <= 3; i++) {
+            const timeInField = document.getElementById(`visitor-in-${i}`);
+            const timeOutField = document.getElementById(`visitor-out-${i}`);
+            
+            if (timeInField && timeOutField && 
+                timeInField.value.trim() !== '' && 
+                timeOutField.value.trim() !== '') {
+                
+                const timeIn = timeInField.value.trim();
+                const timeOut = timeOutField.value.trim();
+                
+                // Convert to comparable values (minutes since midnight)
+                const [inHours, inMinutes] = timeIn.split(':').map(Number);
+                const [outHours, outMinutes] = timeOut.split(':').map(Number);
+                
+                const inMinutesSinceMidnight = inHours * 60 + inMinutes;
+                const outMinutesSinceMidnight = outHours * 60 + outMinutes;
+                
+                if (inMinutesSinceMidnight >= outMinutesSinceMidnight) {
+                    showError(timeOutField, 'Time out must be after time in');
+                    isValid = false;
+                } else {
+                    clearError(timeOutField);
+                }
+            }
+        }
+        
+        return isValid;
+    }
+
+    /**
+     * Validate all required fields
+     * @returns {boolean} - True if all required fields are valid, false otherwise
+     */
+    function validateRequiredFields() {
+        let isValid = true;
+        const requiredFields = document.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            if (field.value.trim() === '') {
+                showError(field, 'This field is required');
+                isValid = false;
+            } else {
+                clearError(field);
+            }
+        });
+        
+        return isValid;
+    }
+
+    /**
+     * Show an error message for a field
+     * @param {HTMLElement} field - The field with the error
+     * @param {string} message - The error message to display
+     */
+    function showError(field, message) {
+        // Find the parent form-group
+        const formGroup = field.closest('.form-group');
+        if (!formGroup) return;
+        
+        // Add error class
+        formGroup.classList.add('has-error');
+        
+        // Find or create error message element
+        let errorElement = formGroup.querySelector('.error-message');
+        if (!errorElement) {
+            errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            formGroup.appendChild(errorElement);
+        }
+        
+        // Set error message
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+    /**
+     * Clear error message for a field
+     * @param {HTMLElement} field - The field to clear errors for
+     */
+    function clearError(field) {
+        // Find the parent form-group
+        const formGroup = field.closest('.form-group');
+        if (!formGroup) return;
+        
+        // Remove error class
+        formGroup.classList.remove('has-error');
+        
+        // Hide error message
+        const errorElement = formGroup.querySelector('.error-message');
+        if (errorElement) {
+            errorElement.style.display = 'none';
+        }
+    }
+
+    /**
+     * Save the current form data to localStorage
+     */
+    function saveDraft() {
+        const formData = new FormData(document.getElementById('dailyReportForm'));
+        const formDataObj = {};
+        
+        // Convert FormData to object
+        for (const [key, value] of formData.entries()) {
+            formDataObj[key] = value;
+        }
+        
+        // Add timestamp
+        formDataObj.savedAt = new Date().toISOString();
+        
+        // Save to localStorage
+        localStorage.setItem('dailyReportDraft', JSON.stringify(formDataObj));
+        
+        // Show notification
+        showNotification('Draft saved successfully!', 'success');
+    }
+
+    /**
+     * Load saved draft from localStorage
+     */
+    function loadSavedDraft() {
+        const savedData = localStorage.getItem('dailyReportDraft');
+        if (!savedData) return;
+        
+        try {
+            const formDataObj = JSON.parse(savedData);
+            const form = document.getElementById('dailyReportForm');
+            
+            // Fill form fields with saved data
+            Object.keys(formDataObj).forEach(key => {
+                if (key !== 'savedAt') {
+                    const field = form.elements[key];
+                    if (field) {
+                        field.value = formDataObj[key];
+                    }
+                }
+            });
+            
+            // Show notification
+            showNotification('Draft loaded from previous session', 'success');
+            
+            // Recalculate totals
+            calculateManpowerTotals();
+            calculateEquipmentTotals();
+            calculateOverallProgress();
+            calculateTotalDeliveries();
+            applyConditionalFormatting();
+            
+        } catch (error) {
+            console.error('Error loading saved draft:', error);
+        }
+    }
+
+    /**
+     * Clear saved draft from localStorage
+     */
+    function clearSavedDraft() {
+        localStorage.removeItem('dailyReportDraft');
+    }
+
+    /**
+     * Show a notification message
+     * @param {string} message - The message to display
+     * @param {string} type - The type of notification ('success' or 'error')
+     */
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = 'notification';
+        notification.classList.add(`notification-${type}`);
+        notification.style.display = 'block';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    /**
+     * Show loading overlay
+     */
+    function showLoading() {
+        document.querySelector('.loading-overlay').style.display = 'flex';
+    }
+
+    /**
+     * Hide loading overlay
+     */
+    function hideLoading() {
+        document.querySelector('.loading-overlay').style.display = 'none';
+    }
+
+    /**
+     * Set up all event listeners for the form
+     */
+    function setupEventListeners() {
+        // Manpower calculation listeners
+        for (let i = 1; i <= 8; i++) {
+            const workersInput = document.getElementById(`workers-${i}`);
+            const hoursInput = document.getElementById(`hours-${i}`);
+            
+            if (workersInput) {
+                workersInput.addEventListener('input', calculateManpowerTotals);
+                workersInput.addEventListener('blur', function() {
+                    validateNumericField(this);
+                });
+            }
+            
+            if (hoursInput) {
+                hoursInput.addEventListener('input', calculateManpowerTotals);
+                hoursInput.addEventListener('blur', function() {
+                    validateNumericField(this);
+                });
+            }
+        }
+        
+        // Equipment calculation listeners
+        for (let i = 1; i <= 5; i++) {
+            const qtyInput = document.getElementById(`equipment-qty-${i}`);
+            const hoursInput = document.getElementById(`equipment-hours-${i}`);
+            
+            if (qtyInput) {
+                qtyInput.addEventListener('input', calculateEquipmentTotals);
+                qtyInput.addEventListener('blur', function() {
+                    validateNumericField(this);
+                });
+            }
+            
+            if (hoursInput) {
+                hoursInput.addEventListener('input', calculateEquipmentTotals);
+                hoursInput.addEventListener('blur', function() {
+                    validateNumericField(this);
+                });
+            }
+        }
+        
+        // Work progress calculation listeners
+        for (let i = 1; i <= 5; i++) {
+            const progressInput = document.getElementById(`work-complete-${i}`);
+            
+            if (progressInput) {
+                progressInput.addEventListener('input', calculateOverallProgress);
+                progressInput.addEventListener('blur', function() {
+                    validatePercentageField(this);
+                });
+            }
+        }
+        
+        // Material delivery calculation listeners
+        for (let i = 1; i <= 5; i++) {
+            const materialInput = document.getElementById(`material-${i}`);
+            
+            if (materialInput) {
+                materialInput.addEventListener('input', calculateTotalDeliveries);
+            }
+        }
+        
+        // Time validation listeners
+        for (let i = 1; i <= 3; i++) {
+            const timeInInput = document.getElementById(`visitor-in-${i}`);
+            const timeOutInput = document.getElementById(`visitor-out-${i}`);
+            
+            if (timeInInput) {
+                timeInInput.addEventListener('blur', function() {
+                    validateTimeField(this);
+                    validateTimeInOut();
+                });
+            }
+            
+            if (timeOutInput) {
+                timeOutInput.addEventListener('blur', function() {
+                    validateTimeField(this);
+                    validateTimeInOut();
+                });
+            }
+        }
+        
+        // Conditional formatting listeners
+        const formattingTriggers = [
+            'issue-impact-', 'safety-reportable-', 
+            'inspection-result-', 'productivity-'
+        ];
+        
+        formattingTriggers.forEach(prefix => {
+            const maxIndex = prefix === 'productivity-' ? 8 : 3;
+            
+            for (let i = 1; i <= maxIndex; i++) {
+                const element = document.getElementById(`${prefix}${i}`);
+                
+                if (element) {
+                    element.addEventListener('change', applyConditionalFormatting);
+                }
+            }
+        });
+        
+        // Save draft button
+        document.getElementById('save-draft-btn').addEventListener('click', saveDraft);
+        
+        // Print button
+        document.getElementById('print-btn').addEventListener('click', function() {
+            window.print();
+        });
+        
+        // Reset button confirmation
+        document.getElementById('reset-btn').addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+                e.preventDefault();
+            } else {
+                clearSavedDraft();
+            }
+        });
+    }
+
+    /**
+     * Set up form submission handler
+     */
+    function setupFormSubmission() {
+        document.getElementById('dailyReportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            const isRequiredValid = validateRequiredFields();
+            const isTimeValid = validateTimeInOut();
+            
+            if (!isRequiredValid || !isTimeValid) {
+                showNotification('Please fix the errors in the form before submitting.', 'error');
+                return;
+            }
+            
+            // Set timestamp
+            document.getElementById('timestamp').value = new Date().toISOString();
+            
+            // Show loading overlay
+            showLoading();
+            
+            // Prepare form data
+            const formData = new FormData(this);
+            
+            // Convert FormData to URL-encoded string
+            const urlEncodedData = new URLSearchParams(formData).toString();
+            
+            // Submit form to Google Apps Script Web App
+            fetch('YOUR_GOOGLE_SCRIPT_URL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: urlEncodedData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                
+                if (data.success) {
+                    // Clear saved draft
+                    clearSavedDraft();
+                    
+                    // Show success message
+                    showNotification('Report submitted successfully!', 'success');
+                    
+                    // Reset form after a delay
+                    setTimeout(() => {
+                        if (confirm('Form submitted successfully! Would you like to create a new report?')) {
+                            this.reset();
+                            setDefaultDate();
+                        }
+                    }, 1000);
+                } else {
+                    showNotification('Error: ' + (data.error || 'Unknown error occurred'), 'error');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                showNotification('Error submitting form. Please try again.', 'error');
+            });
+        });
+    }
+    </script>
+</body>
+</html>
